@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %} Budget {% endblock %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='budget.css')}}">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="static/budget_pie_chart.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"
+  integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
+  crossorigin="anonymous"></script>
+<script type="text/javascript" src="static/javascript/budget_pie_chart.js"></script>
+<script type="text/javascript">
+  var width;
+  var height;
+  if ($(window).width() < 620) {
+    width = $(window).width() - 40;
+    height = width * .73;
+  }
+  else {
+    width = 620;
+    height = 450;
+  }
+
+
+  function drawChart() {
+    var displayData = [];
+    var d = {{ data["Budget"]| tojson | safe
+  }};
+  {% if data['Budget']['Categories'] | length == 0 or data['Budget']['Allocated'] == 0 %}
+  displayData.push(["There's nothing here!", 1, 1, d]);
+  {% endif %}
+  {%if data['Budget']['Catagories'] != {} %}
+  {% for key, value in data['Budget']['Categories'].items() %}
+  displayData.push(['{{key}}', {{ value['Allocated']}}, {{ value['Spent']}}],);
+  console.log("key");
+  {% endfor %}
+  {% endif %}
+  var chart = new BudgetPieChart('piechart', width, height, d);
+  chart.draw(displayData);
+    }
+  $(document).ready(drawChart);
+</script>
+
+{% endblock %}
+
+<!-- Navbar addition -->
+{% block log %} <li><a href="/logout"> Logout </a></li> <a href="/settings"><i class="fas fa-cog"></i></a>{% endblock %}
+{% block content %}
+<div id="man">
+  <div id="month">
+    <h1><span>{{month}} Budget</span></h1>
+  </div>
+  <div class="charts">
+    <canvas id="myChart" width="600" height="450"></canvas>
+    <span id="piechart" style="width: 620px;"></span>
+    <script>
+      var ctx = document.getElementById('myChart');
+      ctx.width = width;
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Spent', 'Allocated', 'Income'],
+          datasets: [{
+            label: 'Your Budget',
+            data: [{{ data["Budget"]["Spent"] }}, {{ data["Budget"]["Allocated"] }},{{ data["Income"]}}],
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)'
+      ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+          borderWidth: 1
+              }]
+          },
+      options: {
+        legend: {
+          display: false
+        },
+        responsive: false,
+          animation: {
+          duration: 0
+        },
+        maintainAspectRatio: true,
+          scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+      });
+    </script>
+  </div>
+  <div>
+    <span style="height: fit-content;"><label for="file"></label>
+  </div>
+  
+  <div class="wrapForm">
+    <!-- Left Form -->
+    {{x|safe}}
+
+    <!-- Right form -->
+    <table class="content-table">
+      <thead id="hi">
+        <!-- Data to be inserted with javascript -->
+      </thead>
+      <tbody id='ct'>
+        <!-- Data to be inserted with javascript -->
+      </tbody>
+    </table>
+
+  </div>
+  <!-- Edit Budget Button -->
+</span>
+<!-- Add button and Edit Budget-->
+  <div class="buttons" style="display:inline;">
+    <form action="/budget_form"><button title="Click here to edit your budget" class='add' id="b2" type="submit">Edit Budget</button></form>
+    <form action="/transaction"><button class="add" id="b1" type="submit">Add a transaction</button></form>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %} Edit Budget {% endblock %}
+{% block head %}
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='budget.css')}}">
+    <!-- Bootstrap core CSS -->
+ <link href="/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+ <!-- Latest compiled and minified CSS -->
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+ <!-- jQuery library -->
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <!-- Latest compiled JavaScript -->
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+ <script type = "text/javascript">
+    var length = {{c|length}};
+    var placeholder = '{{c|tojson}}';
+    var categories = JSON.parse(placeholder);
+    console.log(categories);
+ </script>
+ {% endblock %}
+
+{% block log %} 
+
+<li id = "out"><a href="/logout"> Logout </a></li> 
+<a href="/settings"><i class="fas fa-cog"></i></a>
+
+{% endblock %}
+
+{% block content %}
+<div id = "form">
+    <div class="budget_form">
+        <h1> Edit Your Budget </h1>
+        
+        <!-- show the current budget  | adding other -->
+        <form action="/edit_budget" method=POST> 
+            {% set x = c|length %}
+            <button type="button" class="btn btn-secondary" id='add' onclick="if(validateForm()) addCat();">Add another Category</button>
+        
+            <input type="hidden" id="index" name="index">
+            <button type="submit" class="btn btn-primary" onclick="set_val()">Submit</button>
+        </form>
+    </div>
+</div>
+
+    
+<script type="text/javascript">
+    var x = 0;
+    function setup(){
+        for(var key in categories){
+            addCat();
+            const id = document.getElementsByName(`cat_id${x-1}`)[0];
+            id.setAttribute("value", key);
+            console.log(key);
+            const cat = document.getElementsByName(`cat${x-1}`)[0];
+            cat.setAttribute("value", categories[key]["Name"]);
+            cat.setAttribute("readonly", "");
+            const all = document.getElementsByName(`all${x-1}`)[0];
+            all.setAttribute("value", categories[key]["Allocated"]);
+            all.setAttribute("readonly", "");
+            const ess = document.getElementsByName(`ess${x-1}`)[0];
+            if (categories[key]["Essential"]) ess.setAttribute("checked", "" );
+            ess.setAttribute("disabled", "");
+            const button = `<button type="button" class="btn btn-secondary" value="${x-1}" onclick="edit(this)"> Edit </button>`; 
+            const f = document.getElementById(`cb${x-1}`);
+            f.innerHTML += button;
+        }
+    }
+    
+    function addCat(){
+        var large = `<div  id="${x}">
+            <div class="form-group ">
+            <label>Category: </label>
+            <input type="text" class="form-control" name="cat${x}" required>
+            </div>
+            <div class="form-group ">
+            <label>Allocation: </label>
+            <input type="number" step=0.01 class="form-control" name="all${x}" required>
+            </div>
+            <div class="form-group" id="cb${x}">
+            <input type="checkbox" class="form-check-input" name="ess${x}"> 
+            <label class="form-check-label" for="ess${x}">Is this essential?</label>
+            </div>
+            <input type="hidden" name="cat_id${x}">
+        </div>`;
+        var add_button = document.getElementById("add");
+        add_button.insertAdjacentHTML('beforebegin', large);
+        x++;
+    }
+
+    function edit(button){
+        var index = button.value;
+        console.log(index);
+        var cat = document.getElementsByName("cat" + index)[0];
+        var all = document.getElementsByName("all" + index)[0];
+        var ess = document.getElementsByName("ess" + index)[0];
+        console.log(cat);
+        cat.removeAttribute("readonly");
+        all.removeAttribute("readonly");
+        ess.removeAttribute("disabled");
+    }
+
+    function set_val(){
+        document.getElementById('index').setAttribute("value", x) ;
+        for(var i = 0; i<x; i++){
+            var ess = document.getElementsByName("ess" + i)[0];
+            ess.removeAttribute("disabled");
+            console.log(ess);
+        }
+    }
+    setup();
+
+    
+    function validateForm() {
+        var isValid = true;
+        $('.form-control').each(function() {
+            if ( $(this).val() === '' )
+                isValid = false;
+        });
+        return isValid;
+    }
+ </script>
+
+{% endblock %}

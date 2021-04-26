@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nav.css')}}">
+    {% block head %}{% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %} - BudgetTree</title>
+</head>
+<body>
+    <div>
+        <a name="home"></a>
+        <nav id="navigate">
+            <ul id = "navbar">
+                <li class = 'in'><a href="/">Budget Tree</a></li>
+                <div class="out">
+                    {% block log%} {% endblock %}
+                </div>
+            </ul>
+        </nav>
+    </div>
+    <br><br><br><br>
+    {% block content %} {% endblock %}
+</body>
+</html>

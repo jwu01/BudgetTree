@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %} Budget {% endblock %}
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nav.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login2.css')}}">
+
+  </head>
+{% endblock %}
+{% block content %}
+
+</div>
+
+    <div id = "welcome">
+        <h1 id="w_text"> Welcome!</h1>
+    </div>
+          <div id="wrapper" class="under">
+          <div class="log"><h1><a class="link" href="/login">Login</a></h1></div>
+          <div class="log"><h1><a class="link" href="/signup">Sign Up</a></h1></div>
+
+        </div>
+
+        <div id="blurb">
+            <p>
+                    Using BudgetTree create, explore and take advantage of a well organized budgeting system tailored just for you, that changes to keep up with your life. With BudgetTree, you can learn how to use every single aspect of your financial portfolio to get the most out of your budget, and branch out your possibilities.
+                Input your relevant financial information to your comfort level, and update it anytime and from anywhere.
+                Set up your budget structure, choose your expenses, deductions, what you are and aren't looking to change about your lifestyle and your spending.
+            </p>
+        </div>
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %} Transaction {% endblock %}
+{% block head %}
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='budget.css')}}">
+    <!-- Bootstrap core CSS -->
+ <link href="/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+ <!-- Latest compiled and minified CSS -->
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+ 
+ <link rel="stylesheet" href="{{ url_for('static', filename='login2.css')}}">
+ <!-- jQuery library -->
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <!-- Latest compiled JavaScript -->
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+ <script>
+    var edit = false; 
+     {% if t_id %}
+        edit = true; 
+        var id = "{{t_id}}";
+        var placeholder = '{{t|tojson}}';
+        var transaction = JSON.parse(placeholder);
+     {% endif %}
+
+   
+ </script>
+ {% endblock %}
+
+{% block log %} <li><a href="/logout"> Logout </a></li> <a href="/settings"><i class="fas fa-cog"></i></a>{% endblock %}
+{% block content %}
+<div class="login-box transaction">
+<h1 id ="change"> Add Your Transaction </h1>
+<form action="/store_trans" method=POST> 
+
+    <div class="form-group">
+        <label for="t_cat">Category </label>
+        <select class="form-control" name="t_cat" onchange='checkCat(this.value)' required>
+            <option disabled selected value> -- select an option -- </option>
+            {% for id, category in c %}
+            <option value="{{id}}"> {{category}} </option>
+            {% endfor %}
+            <option value="new">Add a new category</option> 
+        </select>
+    </div>
+
+    <div class="form-group" id="other" hidden = true>
+        <label for="t_newcat">New Category</label>
+        <input type="text" class="form-control" name="t_newcat"  hidden=true>
+        <label for="t_allocate">Amount Allocated to Category</label>
+        <input type="number" class="form-control" name="t_allocate"  hidden=true placeholder="0.00" step=0.01>
+        <label for="t_essential" class="form-check-label">Is this essential?</label>
+        <input type="checkbox" class="form-check-input" name="t_essential">
+    </div>
+
+    <div class="form-group">
+        <label for="t_name">Transaction Name</label>
+        <input type="text" class="form-control" name="t_name" placeholder="E.g Groceries" required>
+    </div>
+
+    <div class="form-group">
+        <label for="t_date">Date</label>
+        <input type="date" class="form-control" name="t_date" placeholder="YYYY-MM-DD" required=false>
+    </div>
+
+    <div class="form-group">
+        <label for="t_amt"> Amount </label>
+        <input type="number" class="form-control" name="t_amt" placeholder="0.00" step=0.01>
+    </div>
+
+    <div class="form-group">
+        <label for="t_note">Note</label>
+        <input type="text" class="form-control" name="t_note" placeholder="A few words">
+    </div>
+    <input type="hidden" name="id">
+    <button type="submit" class="btn btn-primary" onclick="set_id()">Submit</button>
+</form>
+</div>
+    
+<script type="text/javascript">
+    var element = document.getElementById('other');
+    var input = document.getElementsByName('t_newcat');
+    var all = document.getElementsByName('t_allocate');
+    var e = document.getElementsByName('t_essential');
+    function checkCat(val){
+        if (val == "new") {
+            element.hidden = false;
+            input.required = true;
+            all.required = true;
+            e.required = true;
+        }
+        else{ 
+            element.hidden = true;
+            input.required = false;
+            all.required = false;
+            e.required = false;
+        }
+    }
+
+
+    function setup(){
+        if(edit){
+            document.getElementById("change").innerHTML="Edit Your Transaction";
+            let name = document.getElementsByName("t_name")[0];
+            name.setAttribute("value", transaction["Name"]);
+            let category = document.getElementsByName("t_cat")[0];
+            select(category, transaction["Category"]);
+            let date = document.getElementsByName("t_date")[0];
+            date.setAttribute("value", transaction["Date"]);
+            let amt = document.getElementsByName("t_amt")[0];
+            amt.setAttribute("value", transaction["Amount"]);
+            let note = document.getElementsByName("t_note")[0];
+            note.setAttribute("value", transaction["Notes"]);
+        }
+    }
+
+    function set_id(){
+        if (edit){
+            transaction_id = document.getElementsByName("id")[0];
+            transaction_id.setAttribute("value", id);
+        }
+    }
+
+    function select(s, v) {
+        for ( var i = 0; i < s.options.length; i++ ) {
+            if ( s.options[i].value == v ) {
+                s.options[i].selected = true;
+                return;
+             }  
+        }
+    }
+
+    window.onload = setup;
+ </script>
+
+{% endblock %}
+
